@@ -1,53 +1,51 @@
 import './App.css';
-import Todo from "./components/Todo";
-import {useState} from "react";
+import TodoItem from "./components/TodoItem";
+import {useEffect, useState} from "react";
 import {Container, List, Paper} from "@material-ui/core";
 import AddTodo from "./components/AddTodo";
+import {call} from "./api/ApiService";
+import Navbar from "./components/Navbar";
 
 function App() {
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+// ******************************************
+  // 값 불러오기
+  useEffect(()=>{
+    call("/todo","GET",null)
+    .then((response) => {
+      setItems(response.data);
+      setLoading(false);
+    });
+  },[])
 
+  // 아이템 추가
   const addItem = (newItem) => {
     newItem.id = "ID-"+items.length;
     newItem.done = false;
-    setItems([...items, newItem]);
-    console.log("[JHG] items : "+items);
+
+    call("/todo","POST", newItem)
+    .then((response) => setItems(response.data));
   }
 
   const deleteItem = (deletedItem) => {
-    const newItems = items.filter(i => i.id !== deletedItem.id);
-    setItems([...newItems])
+    call("/todo","DELETE", deletedItem)
+    .then((response) => setItems(response.data));
   }
 
   // 아이템 수정
-  const editItem = () => {
-    setItems([...items]); // 상태 업데이트
+  const editItem = (editedItem) => {
+    call("/todo","PUT", editedItem)
+    .then((response) => setItems(response.data));
   }
 
-  const url = "http://localhost:8080/todo"
-  const requestOptions = {
-    method:"GET",
-    header:{"Content-Type":"application/json"}
-  };
-
-  fetch(url, requestOptions)
-    .then(res => res.json)
-    .then(res => {
-      setItems(res.data);
-    },
-    (error) => {
-      alert(error);
-    }
-  );
-
-
 // ********************************************
-  let todoItems = items.length > 0
+  let todoItems = items.length !== 0
     &&  (
       <Paper style={{ margin: 16 }}>
         <List>
           {items.map((item) => (
-            <Todo
+            <TodoItem
               item={item}
               key={item.id}
               editItem={editItem}
@@ -58,11 +56,15 @@ function App() {
       </Paper>
     )
   // ********************************************
+  if(loading) return <h1>로딩중</h1>
   return (
     <div className="App">
+      <Navbar/>
       <Container maxWidth="md">
         <AddTodo addItem={addItem}/>
-        <div className="TodoList">{todoItems}</div>
+        <div className="TodoList">
+          {todoItems}
+        </div>
       </Container>
     </div>
   );

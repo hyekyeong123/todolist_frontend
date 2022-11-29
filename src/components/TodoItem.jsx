@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core";
 import {DeleteOutlined} from "@material-ui/icons";
 
-export default function Todo(props) {
+export default function TodoItem(props) {
   const [item, setItem] = useState(props.item);
   const [readOnly, setReadOnly] = useState(true);
   const deleteItem = props.deleteItem;
@@ -22,16 +22,23 @@ export default function Todo(props) {
   const turnOffReadOnly = () => {
     setReadOnly(false);
   }
+
+
+  // 사용자가 엔터를 클릭할때에 서버에 업로드
   const turnOnReadOnly = (e) => {
-    if(e.key === "Enter"){
+    if(e.key === "Enter" && readOnly === false){
       setReadOnly(true);
+      editItem(item)
     }
   }
 
   // 내용 수정
   const editEventHandler = (e) => {
-    item.title = e.target.value;
-    editItem();
+    // 프론트엔드만 수정
+    setItem({
+      ...item,
+      title : e.target.value
+    })
   }
 
   // 체크박스 변경
@@ -48,7 +55,7 @@ export default function Todo(props) {
       <ListItemText>
         <InputBase
           inputProps={{
-            "aria-label" : "naked",
+            "aria-label" : "nked",
             readOnly:readOnly
           }}
           onClick={turnOffReadOnly}
@@ -58,14 +65,15 @@ export default function Todo(props) {
           id={item.id}
           name={item.id}
           value={item.title}
-          multline={true}
+
+          multline="true"
           fullWidth={true}
         />
       </ListItemText>
 
       <ListItemSecondaryAction>
         <IconButton
-          aria-label="Delete Todo"
+          aria-label="Delete TodoItem"
           onClick={deleteEventHandler} >
           <DeleteOutlined />
         </IconButton>

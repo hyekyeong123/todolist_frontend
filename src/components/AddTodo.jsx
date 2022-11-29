@@ -24,7 +24,7 @@ export default function AddTodo(props) {
   return (
     <Grid container style={{ marginTop: 20 }}>
       <Grid xs={11} md={11} item style={{ paddingRight: 16 }}>
-        <TextField placeholder="Add Todo here" fullWidth
+        <TextField placeholder="Add TodoItem here" fullWidth
           onChange={onInputChange}
           value={item.title}
           onKeyPress={enterKeyEventHandler}
